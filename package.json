@@ -1,0 +1,38 @@
+{
+  "name": "pythondsa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "sync-monaco": "node scripts/sync-monaco.mjs",
+    "postinstall": "node scripts/sync-monaco.mjs",
+    "predev": "node scripts/sync-monaco.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/sync-monaco.mjs",
+    "build": "next build",
+    "verify:browser": "node scripts/verify-browser-grading.mjs --pyodide .pyodide-test",
+    "verify:ds-guides": "node scripts/verify-ds-guides.mjs && node scripts/render-ds-viz.cjs"
+  },
+  "keywords": [],
+  "type": "module",
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@types/node": "^26.6.6",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "autoprefixer": "^10.6.2",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.65.0",
+    "mermaid": "^12.2.0",
+    "monaco-editor": "0.55.1",
+    "next": "16.4.3",
+    "postcss": "^8.5.32",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^3.4.14"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

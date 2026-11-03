@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+next-env.d.ts
+
+# TypeScript incremental build info
+*.tsbuildinfo
+
+# Monaco is copied here from node_modules by scripts/sync-monaco.mjs (runs on install, dev and build)
+public/monaco/
+
+# Pyodide installed for `npm run verify:browser` (npm install --prefix .pyodide-test pyodide@314.0.4)
+.pyodide-test/
+
+# Saved progress from the old server-backed version (the site now keeps progress in the browser)
+data/user_state.json
+data/.user_state.*.tmp
+data/user_state.corrupt-*.json
+
+# Environment files
+.env*
+
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --primary: 210 100% 52%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --ring: 216 34% 17%;
+    --radius: 0.5rem;
+  }
+}
+
+/* Desktop sidebar width; collapsing it is a CSS-only change so it never flashes on load. */
+:root { --sidebar-w: 13.5rem; }
+html[data-sidebar="collapsed"] { --sidebar-w: 4.25rem; }
+
+body {
+  background-color: #0c1217;
+  color: #e6eeeb;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #c9f27b;
+  outline-offset: 3px;
+}
+::selection { background: #c9f27b55; color: #f5fff1; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111a20;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #34434a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* ---- Data structures & algorithms visualizer (components/ds-viz) ---- */
+@keyframes dsviz-pop { 0% { transform: scale(0.8); } 55% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes dsviz-enter { from { opacity: 0; transform: translateY(-12px) scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes dsviz-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dsviz-flow { to { stroke-dashoffset: -22; } }
+.dsviz-pop { animation: dsviz-pop 0.45s ease-out; }
+.dsviz-enter { animation: dsviz-enter 0.4s ease-out; }
+.dsviz-fade { animation: dsviz-fade 0.45s ease-out; }
+.dsviz-flow { stroke-dasharray: 7 4; animation: dsviz-flow 0.7s linear infinite; }
+.dsviz-move { transition: left 0.55s cubic-bezier(0.65, 0, 0.35, 1), top 0.55s cubic-bezier(0.65, 0, 0.35, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .dsviz-pop, .dsviz-enter, .dsviz-fade, .dsviz-flow { animation: none !important; }
+  .dsviz-move { transition: none !important; }
+}
