@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Braces, CalendarDays, Code2, Database, Flame, GraduationCap, Layers3, LayoutGrid, MessagesSquare, Network, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { BookOpen, Braces, CalendarDays, Code2, Database, Flame, GraduationCap, Layers3, LayoutGrid, MessagesSquare, Network, Menu, PanelLeftClose, PanelLeftOpen, User, X } from "lucide-react";
 import type { UserState } from "@/lib/storage";
 import { readCollapsed, writeCollapsed } from "@/lib/ui-prefs";
 import { apiFetch } from "@/lib/local-api";
@@ -32,11 +32,14 @@ function Brand({ size = "h-8 w-8" }: { size?: string }) {
 }
 
 export function Sidebar() {
-  const pathname = usePathname();
+  // With trailingSlash the router may report "/dsa/"; nav hrefs have no trailing slash.
+  const pathname = usePathname().replace(/(.)\/$/, "$1");
   const [profile, setProfile] = useState<UserState["profile"] | null>(null);
   const [days, setDays] = useState<number | null>(null);
   // Visual state comes from <html data-sidebar>; this only keeps aria-expanded accurate.
   const [collapsed, setCollapsed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const current = items.find(item => item.href === pathname);
 
   useLayoutEffect(() => { setCollapsed(readCollapsed("sidebar")); }, []);
   function toggle() {
@@ -52,6 +55,14 @@ export function Sidebar() {
       return response.json() as Promise<UserState>;
     }).then(state => setProfile(state.profile)).catch(() => {});
   }, [pathname]);
+  // Close the phone menu on navigation and with Escape.
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
   useEffect(() => {
     if (!profile?.targetDate) return;
     const update = () => setDays(Math.max(0, Math.ceil((new Date(profile.targetDate).getTime() - Date.now()) / 86_400_000)));
@@ -60,14 +71,33 @@ export function Sidebar() {
     return () => clearInterval(interval);
   }, [profile?.targetDate]);
 
-  const initials = profile?.name?.split(" ").map(part => part[0]).slice(0, 2).join("") || "JM";
+  const initials = profile?.name?.split(" ").map(part => part[0]).slice(0, 2).join("").toUpperCase();
   const streak = !profile ? "Personal workspace" : profile.currentStreak ? `${profile.currentStreak} day streak` : "Practice today to start a streak";
   const targetDate = profile?.targetDate ? new Date(profile.targetDate).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }) : "Loading…";
 
   return <>
-    <div className="sticky top-0 z-30 border-b border-[#27313b] bg-[#10161d]/95 px-4 py-3 backdrop-blur md:hidden">
-      <div className="mb-3 flex items-center gap-2.5"><Brand /><span className="text-sm font-semibold tracking-tight text-white">interview<span className="text-[#c9f27b]">os</span></span></div>
-      <nav aria-label="Main navigation" className="flex gap-1.5 overflow-x-auto pb-1">{items.map(item => <Link key={item.href} href={item.href} aria-current={pathname === item.href ? "page" : undefined} className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium ${pathname === item.href ? "bg-[#c9f27b] text-[#182119]" : "bg-[#1b242d] text-[#a9b6c3]"}`}>{item.name}</Link>)}</nav>
+    <div className="sticky top-0 z-40 border-b border-[#27313b] bg-[#10161d]/95 backdrop-blur md:hidden">
+      <div className="flex h-14 items-center gap-2.5 px-4">
+        <Link href="/" className="flex min-w-0 items-center gap-2.5"><Brand /><span className="text-sm font-semibold tracking-tight text-white">interview<span className="text-[#c9f27b]">os</span></span></Link>
+        <span className="ml-auto truncate text-xs text-[#8a9b8f]">{current?.name}</span>
+        <button onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="mobile-nav" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#2c3838] text-[#d4dfd8] active:bg-[#1a232b]">
+          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}<span className="sr-only">{menuOpen ? "Close menu" : "Open menu"}</span>
+        </button>
+      </div>
+      {menuOpen && <div aria-hidden="true" onClick={() => setMenuOpen(false)} className="fixed inset-x-0 bottom-0 top-14 bg-black/50" />}
+      {menuOpen && <nav id="mobile-nav" aria-label="Main navigation" className="absolute inset-x-0 top-full max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-y border-[#202a33] bg-[#10161d] px-3 pb-4 pt-2 shadow-2xl shadow-black/60">
+        {groups.map(group => <div key={group.label} className="mt-2">
+          <p className="px-2.5 pb-1.5 pt-2 text-[10px] font-bold tracking-[0.14em] text-[#6f7d89]">{group.label}</p>
+          <div className="grid grid-cols-1 gap-0.5 min-[480px]:grid-cols-2">{group.items.map(item => {
+            const active = pathname === item.href;
+            const Icon = item.icon;
+            return <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} aria-current={active ? "page" : undefined} className={`flex min-h-11 items-center gap-3 rounded-lg px-2.5 text-sm font-medium ${active ? "bg-[#263428] text-[#d6f6a5]" : "text-[#b3c0ca] active:bg-[#1a232b]"}`}>
+              <Icon className={`h-4 w-4 shrink-0 ${active ? "text-[#c9f27b]" : "text-[#71818e]"}`} strokeWidth={1.8} />{item.name}
+            </Link>;
+          })}</div>
+        </div>)}
+        <p className="mt-4 flex items-center gap-2 border-t border-[#202a33] px-2.5 pt-3 text-xs text-[#82909a]"><CalendarDays className="h-3.5 w-3.5 text-[#c9f27b]" />{days ?? "—"} days to go<span className="text-[#4f5d66]">·</span><Flame className="h-3.5 w-3.5 text-[#c9f27b]" />{streak}</p>
+      </nav>}
     </div>
 
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-[var(--sidebar-w)] flex-col border-r border-[#27313b] bg-[#10161d] transition-[width] duration-200 md:flex">
@@ -111,7 +141,7 @@ export function Sidebar() {
           <span className={tooltip} aria-hidden="true">{days ?? "—"} days to go · {targetDate}</span>
         </div>
         <div className="group relative flex items-center gap-2.5 px-0.5 sidebar-collapsed:justify-center sidebar-collapsed:px-0">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#35463a] text-[11px] font-bold text-[#d4f4a2]">{initials}</div>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#35463a] text-[11px] font-bold text-[#d4f4a2]">{initials || <User className="h-4 w-4" />}</div>
           <div className="min-w-0 flex-1 sidebar-collapsed:hidden"><p className="truncate text-[13px] font-semibold text-[#ecf1ee]">{profile?.name || "Your workspace"}</p><p className="flex items-center gap-1 truncate text-[11px] text-[#82909a]"><Flame className="h-3 w-3 shrink-0 text-[#c9f27b]" /> {streak}</p></div>
           <span className={tooltip} aria-hidden="true">{profile?.name || "Your workspace"} · {streak}</span>
         </div>

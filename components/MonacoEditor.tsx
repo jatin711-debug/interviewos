@@ -25,9 +25,24 @@ type MonacoEditorProps = EditorProps & {
 };
 
 /** Monaco, loaded locally and only created when it is about to be seen. Give the parent a height. */
-export function MonacoEditor({ eager = false, beforeMount, onMount, ...props }: MonacoEditorProps) {
+/** True on phone-width screens, where the editor trims its gutter to leave room for code. */
+function useNarrowScreen() {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 639px)");
+    const update = () => setNarrow(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return narrow;
+}
+
+export function MonacoEditor({ eager = false, beforeMount, onMount, options, ...props }: MonacoEditorProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(eager);
+  const narrow = useNarrowScreen();
+  const fitted = narrow ? { ...options, lineNumbersMinChars: 2, lineDecorationsWidth: 6, glyphMargin: false, folding: false, fontSize: Math.min(options?.fontSize ?? 14, 13) } : options;
   useEffect(() => {
     if (visible) return;
     const node = ref.current;
@@ -42,6 +57,6 @@ export function MonacoEditor({ eager = false, beforeMount, onMount, ...props }: 
   }, [visible]);
 
   return <div ref={ref} className="relative h-full w-full">
-    {visible ? <Editor {...props} beforeMount={monaco => { configureEditorAssistance(monaco); beforeMount?.(monaco); }} onMount={onMount} /> : props.loading}
+    {visible ? <Editor {...props} options={fitted} beforeMount={monaco => { configureEditorAssistance(monaco); beforeMount?.(monaco); }} onMount={onMount} /> : props.loading}
   </div>;
 }

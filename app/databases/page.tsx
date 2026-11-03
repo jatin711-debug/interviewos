@@ -49,8 +49,8 @@ export default function DatabaseInternalsPage() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#29363c]">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 font-mono text-xs font-semibold">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+            <span className="shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 font-mono text-xs font-semibold">
               PILLAR 4
             </span>
             <h1 className="text-2xl font-bold text-white tracking-tight">Database Internals Lab</h1>

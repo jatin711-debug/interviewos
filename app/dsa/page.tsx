@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Circle, Code2, Compass, PanelLeftClose, PanelLeftOpen, RotateCcw, Search, Sparkles, X } from "lucide-react";
 import { CodeEditor } from "@/components/CodeEditor";
@@ -77,7 +77,12 @@ export default function DSADojoPage() {
   const nextProblem = DSA_PROBLEMS.find(p => !problemProgress(p, progress)?.solved);
   const percent = Math.round(solvedCount / DSA_PROBLEMS.length * 100);
 
-  function chooseProblem(problem: DSAProblem) { setSelectedId(problem.id); setReview(null); }
+  const workspaceRef = useRef<HTMLDivElement>(null);
+  function chooseProblem(problem: DSAProblem, fromLibrary = false) {
+    setSelectedId(problem.id); setReview(null);
+    // Below 2xl the library sits above the problem, so bring the problem into view.
+    if (fromLibrary && !window.matchMedia("(min-width: 1536px)").matches) requestAnimationFrame(() => workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
   function clearFilters() { setQuery(""); setCategory("all"); setDifficulty("all"); setStatus("all"); }
   function openTopic(topic: DSACategory) {
     setQuery(""); setDifficulty("all"); setStatus("all"); setCategory(topic);
@@ -197,14 +202,14 @@ export default function DSADojoPage() {
               <label className="block"><span className="sr-only">Filter by topic</span><select value={category} onChange={e => setCategory(e.target.value as DSACategory | "all")} className={field}><option value="all">All topics</option>{categories.map(c => <option value={c} key={c}>{c}</option>)}</select></label>
               <div className="grid grid-cols-2 gap-2"><label><span className="sr-only">Filter by difficulty</span><select value={difficulty} onChange={e => setDifficulty(e.target.value)} className={field}><option value="all">Any difficulty</option>{difficulties.map(d => <option key={d}>{d}</option>)}</select></label><label><span className="sr-only">Filter by status</span><select value={status} onChange={e => setStatus(e.target.value as Status)} className={field}><option value="all">Any status</option><option value="unsolved">Unsolved</option><option value="solved">Solved</option></select></label></div>
             </div>
-            <div className="mt-4 max-h-[480px] space-y-1 overflow-y-auto border-t border-slate-800 pt-3 2xl:max-h-[690px]">
-              {filtered.map(p => { const isSelected = selected?.id === p.id; const solved = problemProgress(p, progress)?.solved; return <button key={p.id} onClick={() => chooseProblem(p)} aria-pressed={isSelected} className={`flex w-full items-start gap-2.5 rounded-lg px-3 py-2.5 text-left transition ${isSelected ? "bg-blue-500/15 ring-1 ring-blue-500/30" : "hover:bg-slate-800/60"}`}>
+            <div className="mt-4 max-h-[45vh] space-y-1 overflow-y-auto border-t border-slate-800 pt-3 sm:max-h-[480px] 2xl:max-h-[690px]">
+              {filtered.map(p => { const isSelected = selected?.id === p.id; const solved = problemProgress(p, progress)?.solved; return <button key={p.id} onClick={() => chooseProblem(p, true)} aria-pressed={isSelected} className={`flex w-full items-start gap-2.5 rounded-lg px-3 py-2.5 text-left transition ${isSelected ? "bg-blue-500/15 ring-1 ring-blue-500/30" : "hover:bg-slate-800/60"}`}>
                 {solved ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" /> : <Circle className="mt-0.5 h-4 w-4 shrink-0 text-slate-600" />}<span className="min-w-0 flex-1"><span className={`block text-sm font-medium ${isSelected ? "text-blue-200" : "text-slate-200"}`}>{p.title}</span><span className="mt-1 block text-xs text-slate-500">{p.category}</span></span><span className={`pt-0.5 text-[11px] ${difficultyColor[p.difficulty]}`}>{p.difficulty}</span>
               </button>; })}
               {!filtered.length && <div className="py-8 text-center text-sm text-slate-400"><p>No problems match these filters.</p><button onClick={clearFilters} className="mt-3 text-blue-400 hover:text-blue-300">Clear filters</button></div>}
             </div>
           </aside>
-          {selected ? <div className="min-w-0 space-y-4">
+          {selected ? <div ref={workspaceRef} className="min-w-0 scroll-mt-20 space-y-4 md:scroll-mt-6">
             <div className="hidden flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-800 bg-[#0b111d] px-3 py-2 library-collapsed:flex">
               <button onClick={toggleLibrary} aria-expanded={!libraryHidden} aria-controls="dsa-problem-library" className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-slate-200 transition hover:bg-slate-800/70"><PanelLeftOpen className="h-4 w-4 text-slate-400" />Problem library</button>
               <div className="flex items-center gap-1 text-xs text-slate-400">

@@ -83,14 +83,14 @@ export default function InterviewPrepPage() {
         <h1 className="text-2xl font-bold text-white tracking-tight">Interview prep: your STAR story vault</h1>
         <p className="text-sm leading-6 text-[#93a5a8] mt-2">
           Write down your best behavioral stories once, in Situation, Task, Action, Result form, and rehearse them before interviews.
-          Stories are saved on this machine only.
+          Stories are saved in this browser only.
         </p>
       </div>
 
       {/* VIEW 2: Behavioral STAR Vault */}
       {(
         <div className="space-y-6">
-          <div className="flex items-center justify-between pb-2 border-b border-[#29363c]">
+          <div className="flex flex-col gap-3 pb-2 border-b border-[#29363c] sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-lg font-bold text-white">Your Behavioral STAR Stories</h2>
               <p className="text-xs text-slate-400">
@@ -99,7 +99,7 @@ export default function InterviewPrepPage() {
             </div>
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+              className="self-start sm:self-auto shrink-0 whitespace-nowrap px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               {isEditing ? "Cancel" : "Add STAR Story"}

@@ -4,6 +4,9 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Eye, Pause, Play, RotateCcw } from "lucide-react";
 import type { ArrayPanel, BucketsPanel, GraphPanel, GridPanel, LinkedPanel, Panel, StackPanel, TextPanel, Tone, TreeNode, TreePanel, VarsPanel, Visual } from "@/lib/ds-viz/types";
 
+// On narrow screens diagrams shrink to fit, but not below this scale (then they scroll sideways).
+const FIT_MIN_SCALE = 0.65;
+
 // Animation model: panels keep their identity between steps (keyed by position and type), so
 //  - array cells / linked-list nodes with `ids` slide to their new index (CSS left transition, .dsviz-move),
 //  - tree nodes glide to their new layout position (requestAnimationFrame tween, see useTween),
@@ -190,7 +193,7 @@ function TreeView({ panel }: { panel: TreePanel }) {
   const height = Math.max(...all.map(p => p.y + PAD + 14));
   // Draw in a stable order (by id) so React keeps each node's elements while it moves.
   const nodes = [...placed].sort((a, b) => a.id.localeCompare(b.id));
-  return <div className="overflow-x-auto"><svg width={width} height={height} role="img" aria-label="tree diagram" className="block">
+  return <div className="overflow-x-auto"><svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label="tree diagram" className="block h-auto max-w-full" style={{ minWidth: Math.round(width * FIT_MIN_SCALE) }}>
     {nodes.filter(p => p.parent && pos[p.parent]).map(p => { const a = pos[p.parent!], b = pos[p.id]; const on = p.node.tone === "path" || p.node.tone === "found"; return <g key={`edge-${p.id}`}><line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={on ? TONE.path.stroke : "#4f6b6b"} strokeWidth={on ? 2.5 : 1.5} style={{ transition: "stroke .3s" }} />{p.node.edgeLabel && <text x={(a.x + b.x) / 2 + (b.x >= a.x ? 6 : -6)} y={(a.y + b.y) / 2} fill="#c9f27b" fontSize="11" fontFamily="monospace" textAnchor={b.x >= a.x ? "start" : "end"}>{p.node.edgeLabel}</text>}</g>; })}
     {nodes.map(p => { const t = tone(p.node.tone); const { x, y } = pos[p.id]; return <g key={p.id} className="dsviz-fade">
       {(p.node.tone === "active" || p.node.tone === "found") && <circle key={`ring-${p.node.tone}`} cx={x} cy={y} r={R} fill="none" stroke={t.stroke} strokeWidth={2}><animate attributeName="r" from={R} to={R + 10} dur="1.2s" repeatCount="indefinite" /><animate attributeName="opacity" from="0.8" to="0" dur="1.2s" repeatCount="indefinite" /></circle>}
@@ -208,7 +211,7 @@ function GraphView({ panel }: { panel: GraphPanel }) {
   const pairs = new Set(panel.edges.map(edge => `${edge.from}->${edge.to}`));
   const width = Math.max(...panel.nodes.map(node => node.x)) * S + 40;
   const height = Math.max(...panel.nodes.map(node => node.y)) * S + 44;
-  return <div className="overflow-x-auto"><svg width={width} height={height} role="img" aria-label="graph diagram" className="block">
+  return <div className="overflow-x-auto"><svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} role="img" aria-label="graph diagram" className="block h-auto max-w-full" style={{ minWidth: Math.round(width * FIT_MIN_SCALE) }}>
     <defs>{(Object.keys(EDGE) as Tone[]).map(key => <marker key={key} id={`arrow-${key}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill={EDGE[key]} /></marker>)}</defs>
     {panel.edges.map(edge => {
       const a = nodes.get(edge.from), b = nodes.get(edge.to);

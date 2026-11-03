@@ -39,9 +39,9 @@ export function CodeView({ code, language, label = "Code" }: { code: string; lan
     return { tokens: highlightCode(code, language), guides: indentGuides(lines) };
   }, [code, language]);
 
-  return <div role="region" aria-label={label} tabIndex={0} className="h-full overflow-auto bg-[#1e1e1e] [font-family:Consolas,'Courier_New',monospace] text-[13px] leading-[21px] outline-none [font-feature-settings:'liga'_0,'calt'_0] [tab-size:4] focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-[#3c5a46]">
+  return <div role="region" aria-label={label} tabIndex={0} className="h-full overflow-auto bg-[#1e1e1e] [font-family:Consolas,'Courier_New',monospace] text-[12px] leading-[21px] sm:text-[13px] outline-none [font-feature-settings:'liga'_0,'calt'_0] [tab-size:4] focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-[#3c5a46]">
     <div className="flex min-w-max py-[14px]">
-      <div aria-hidden="true" className="sticky left-0 z-[1] w-[62px] shrink-0 select-none bg-[#1e1e1e] pr-[26px] text-right text-[#858585]">
+      <div aria-hidden="true" className="sticky left-0 z-[1] w-[38px] shrink-0 select-none bg-[#1e1e1e] pr-3 text-right text-[#858585] sm:w-[62px] sm:pr-[26px]">
         {tokens.map((_, index) => <div key={index}>{index + 1}</div>)}
       </div>
       <div className="relative pr-8">

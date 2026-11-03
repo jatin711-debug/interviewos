@@ -40,7 +40,7 @@ export interface DsLesson {
   useWhen: string[];
   /** What to use in production instead of hand-rolling it (standard library, usually), and when hand-rolling is right. */
   inPractice: string;
-  /** Auto-graded exercise, run on the local server's Python by lib/python-challenge.ts. */
+  /** Auto-graded exercise, run in browser Python (Pyodide) by lib/python-challenge.ts. */
   challenge: LessonChallenge;
   /** DSA practice topics to continue with. */
   practice: DSACategory[];

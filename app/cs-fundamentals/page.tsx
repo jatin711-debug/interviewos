@@ -41,8 +41,8 @@ export default function CSFundamentalsPage() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#29363c]">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+            <span className="shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs">
               PILLAR 5 &amp; 6
             </span>
             <h1 className="text-2xl font-bold text-white tracking-tight">
